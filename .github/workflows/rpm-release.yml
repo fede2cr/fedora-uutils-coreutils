@@ -23,7 +23,7 @@ jobs:
             rpm_arch: aarch64
             env:
               CARGO_BUILD_TARGET: aarch64-unknown-linux-gnu
-              RUSTFLAGS="-C target-feature=-avx512f,-avx512vl"
+              RUSTFLAGS: "-C target-feature=-avx512f,-avx512vl"
 
 
     container:
