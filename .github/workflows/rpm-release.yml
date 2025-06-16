@@ -28,6 +28,10 @@ jobs:
 
     container:
       image: ${{ matrix.container }}
+    env:
+      CARGO_BUILD_TARGET: ${{ matrix.env.CARGO_BUILD_TARGET }}
+      RUSTFLAGS: ${{ matrix.env.RUSTFLAGS }}
+
 
     steps:
       - name: Install build dependencies
