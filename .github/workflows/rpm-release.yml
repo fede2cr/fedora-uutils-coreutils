@@ -16,59 +16,47 @@ jobs:
         arch: [x86_64, aarch64]
         include:
           - arch: x86_64
-            container: registry.fedoraproject.org/fedora:41
-            rpm_arch: x86_64
-            env:
-              CARGO_BUILD_TARGET: x86_64-unknown-linux-gnu
-              CFLAGS: "-std=gnu11"
+            qemu_arch: x86_64
           - arch: aarch64
-            container: registry.fedoraproject.org/fedora:41
-            rpm_arch: aarch64
-            env:
-              CARGO_BUILD_TARGET: aarch64-unknown-linux-gnu
-              CFLAGS: "-std=gnu11"
+            qemu_arch: aarch64
 
     container:
       image: ${{ matrix.container }}
 
-    env:
-      CARGO_BUILD_TARGET: ${{ matrix.env.CARGO_BUILD_TARGET }}
-      CFLAGS: ${{ matrix.env.CFLAGS }}
-
     steps:
-      - name: Install build dependencies
-        run: |
-          uname -m
-          dnf -y update
-          dnf -y install rpmdevtools gcc rustup ca-certificates kernel-headers
-          rustup-init -y --target $CARGO_BUILD_TARGET
-          . "$HOME/.cargo/env"
-
       - name: Checkout repository
         uses: actions/checkout@v4
+      
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
 
-      - name: Prepare RPM build environment
+      - name: Install build dependencies
         run: |
-          rpmdev-setuptree
-          cp uutils-coreutils/*.spec ~/rpmbuild/SPECS/
-          spectool -C ~/rpmbuild/SOURCES/ -g ~/rpmbuild/SPECS/uutils-coreutils.spec
+          dnf -y update
+          dnf -y install rpmdevtools gcc rust cargo ca-certificates kernel-headers
 
-      - name: Build RPM
-        run: |
-          . "$HOME/.cargo/env"
-          rpmbuild -ba ~/rpmbuild/SPECS/*.spec --target ${{ matrix.rpm_arch }}
-
-      - name: Find built RPM
-        id: find_rpm
-        run: |
-          RPM_PATH=$(find ~/rpmbuild/RPMS -name "*.rpm" | grep -v debuginfo | head -n 1)
-          echo "rpm_path=$RPM_PATH" >> $GITHUB_OUTPUT
+      - name: Run on ${{ matrix.arch }}
+        uses: uraimo/run-on-arch-action@v2
+        with:
+          arch: ${{ matrix.qemu_arch }}
+          distro: fedora_latest
+          install: |
+            dnf -y update
+            dnf -y install rpmdevtools gcc rust cargo ca-certificates kernel-headers
+          run: |
+            rpmdev-setuptree
+            cp uutils-coreutils/*.spec ~/rpmbuild/SPECS/
+            spectool -C ~/rpmbuild/SOURCES/ -g ~/rpmbuild/SPECS/uutils-coreutils.spec
+            rpmbuild -ba ~/rpmbuild/SPECS/*.spec --target ${{ matrix.arch }}
+            RPM_PATH=$(find ~/rpmbuild/RPMS -name "*.rpm" | grep -v debuginfo | head -n 1)
+            mkdir -p /github/workspace/artifacts
+            cp "$RPM_PATH" /github/workspace/artifacts/
 
       - name: Upload RPM artifact
         uses: actions/upload-artifact@v4
         with:
           name: uutils-coreutils-${{ matrix.arch }}
-          path: ${{ steps.find_rpm.outputs.rpm_path }}
+          path: artifacts/*.rpm
 
   release:
     needs: build-rpm
