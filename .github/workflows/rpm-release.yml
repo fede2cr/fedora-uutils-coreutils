@@ -38,7 +38,7 @@ jobs:
         run: |
           dnf -y update
           dnf -y install rpmdevtools gcc rustup ca-certificates kernel-headers
-          rustup-init -y --target $CARGO_BUILD_TARGET
+          rustup-init -y --default-toolchain nightly --target $CARGO_BUILD_TARGET
           . "$HOME/.cargo/env"
 
       - name: Checkout repository
