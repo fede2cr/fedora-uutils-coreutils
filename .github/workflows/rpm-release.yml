@@ -40,8 +40,8 @@ jobs:
       - name: Install build dependencies
         run: |
           dnf -y update
-          dnf -y install rpmdevtools gcc rust rustup cargo ca-certificates kernel-headers
-          rustup target add $CARGO_BUILD_TARGET
+          dnf -y install rpmdevtools gcc rustup ca-certificates kernel-headers
+          rustup-init -y target add $CARGO_BUILD_TARGET
 
       - name: Checkout repository
         uses: actions/checkout@v4
