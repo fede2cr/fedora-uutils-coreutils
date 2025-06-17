@@ -20,18 +20,20 @@ jobs:
             rpm_arch: x86_64
             env:
               CARGO_BUILD_TARGET: x86_64-unknown-linux-gnu
+              CFLAGS: "-std=gnu11"
           - arch: aarch64
             container: registry.fedoraproject.org/fedora:41
             rpm_arch: aarch64
             env:
               CARGO_BUILD_TARGET: aarch64-unknown-linux-gnu
-
+              CFLAGS: "-std=gnu11"
 
     container:
       image: ${{ matrix.container }}
 
     env:
       CARGO_BUILD_TARGET: ${{ matrix.env.CARGO_BUILD_TARGET }}
+      CFLAGS: ${{ matrix.env.CFLAGS }}
 
     steps:
       - name: Install build dependencies
