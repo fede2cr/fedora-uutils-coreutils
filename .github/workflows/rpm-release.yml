@@ -38,6 +38,7 @@ jobs:
     steps:
       - name: Install build dependencies
         run: |
+          uname -m
           dnf -y update
           dnf -y install rpmdevtools gcc rustup ca-certificates kernel-headers
           rustup-init -y --target $CARGO_BUILD_TARGET
