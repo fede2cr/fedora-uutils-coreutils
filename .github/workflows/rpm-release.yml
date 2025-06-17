@@ -30,16 +30,11 @@ jobs:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
-      - name: Install build dependencies
-        run: |
-          dnf -y update
-          dnf -y install rpmdevtools gcc rust cargo ca-certificates kernel-headers
-
       - name: Run on ${{ matrix.arch }}
         uses: uraimo/run-on-arch-action@v2
         with:
           arch: ${{ matrix.qemu_arch }}
-          distro: fedora_latest
+          distro: fedora_42
           install: |
             dnf -y update
             dnf -y install rpmdevtools gcc rust cargo ca-certificates kernel-headers
