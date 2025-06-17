@@ -34,7 +34,7 @@ jobs:
         uses: uraimo/run-on-arch-action@v2
         with:
           arch: ${{ matrix.qemu_arch }}
-          distro: fedora_42
+          distro: fedora_latest
           install: |
             dnf -y update
             dnf -y install rpmdevtools gcc rust cargo ca-certificates kernel-headers
