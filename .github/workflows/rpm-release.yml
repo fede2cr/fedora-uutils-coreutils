@@ -20,13 +20,11 @@ jobs:
             rpm_arch: x86_64
             env:
               CARGO_BUILD_TARGET: x86_64-unknown-linux-gnu
-              RUSTFLAGS: ""
           - arch: aarch64
             container: registry.fedoraproject.org/fedora:42
             rpm_arch: aarch64
             env:
               CARGO_BUILD_TARGET: aarch64-unknown-linux-gnu
-              RUSTFLAGS: "-C target-feature=-avx512f,-avx512vl"
 
 
     container:
@@ -34,7 +32,6 @@ jobs:
 
     env:
       CARGO_BUILD_TARGET: ${{ matrix.env.CARGO_BUILD_TARGET }}
-      RUSTFLAGS: ${{ matrix.env.RUSTFLAGS }}
 
     steps:
       - name: Install build dependencies
