@@ -10,8 +10,8 @@ Summary:        Core utilities rewritten in Rust
 License:        MIT OR Apache-2.0
 Source0:        https://github.com/uutils/coreutils/archive/refs/tags/%{version}.tar.gz
 
-BuildRequires:  rust
-BuildRequires:  cargo
+#BuildRequires:  rust
+#BuildRequires:  cargo
 BuildRequires:  gcc
 
 %description
