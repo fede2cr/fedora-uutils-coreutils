@@ -11,17 +11,6 @@ permissions:
 jobs:
   build-rpm:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        arch: [x86_64, aarch64]
-        include:
-          - arch: x86_64
-            qemu_arch: x86_64
-          - arch: aarch64
-            qemu_arch: aarch64
-
-    container:
-      image: ${{ matrix.container }}
 
     steps:
       - name: Checkout repository
@@ -30,11 +19,20 @@ jobs:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
-      - name: Run on ${{ matrix.arch }}
+      - name: Install build dependencies
+        run: |
+          dnf -y update
+          dnf -y install rpmdevtools gcc rust cargo ca-certificates kernel-headers
+
+      - name: Run on aarch64
         uses: uraimo/run-on-arch-action@v2
         with:
-          arch: ${{ matrix.qemu_arch }}
+          arch: aarch64
           distro: fedora_latest
+          setup: |
+            mkdir -p "${PWD}/artifacts"
+          dockerRunArgs: |
+            --volume "${PWD}/artifacts:/artifacts"
           install: |
             dnf -y update
             dnf -y install rpmdevtools gcc rust cargo ca-certificates kernel-headers
@@ -42,7 +40,7 @@ jobs:
             rpmdev-setuptree
             cp uutils-coreutils/*.spec ~/rpmbuild/SPECS/
             spectool -C ~/rpmbuild/SOURCES/ -g ~/rpmbuild/SPECS/uutils-coreutils.spec
-            rpmbuild -ba ~/rpmbuild/SPECS/*.spec --target ${{ matrix.arch }}
+            rpmbuild -ba ~/rpmbuild/SPECS/*.spec
             RPM_PATH=$(find ~/rpmbuild/RPMS -name "*.rpm" | grep -v debuginfo | head -n 1)
             mkdir -p /github/workspace/artifacts
             cp "$RPM_PATH" /github/workspace/artifacts/
