@@ -17,6 +17,7 @@ BuildRequires:  gcc
 %description
 Rust-coreutils is a reimplementation of the GNU core utilities in Rust.
 
+%global debug_package %{nil}
 %global _libdir /usr/lib
 
 %prep
