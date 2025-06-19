@@ -17,11 +17,13 @@ BuildRequires:  gcc
 %description
 Rust-coreutils is a reimplementation of the GNU core utilities in Rust.
 
+%global _libdir /usr/lib
+
 %prep
 %setup -n coreutils-%{version} 
 
 %build
-cargo build --release --features unix --target-dir /usr/lib/cargo
+cargo build --release --features unix
 
 %install
 install -Dm0755 target/release/coreutils %{buildroot}%{_bindir}/coreutils
