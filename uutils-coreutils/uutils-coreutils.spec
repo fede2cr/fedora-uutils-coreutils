@@ -21,7 +21,7 @@ Rust-coreutils is a reimplementation of the GNU core utilities in Rust.
 %setup -n coreutils-%{version} 
 
 %build
-cargo build --release --features unix
+cargo build --release --features unix --target-dir /usr/lib/cargo
 
 %install
 install -Dm0755 target/release/coreutils %{buildroot}%{_bindir}/coreutils
